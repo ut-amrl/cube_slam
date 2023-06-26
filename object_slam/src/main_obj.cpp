@@ -308,7 +308,7 @@ void publish_all_poses(std::vector<tracking_frame*> all_frames,std::vector<objec
 		if (frame_number%2==0) // show point cloud every N frames
 		{
 		    std::string raw_depth_img_name = base_folder+"depth_imgs/" + std::string(frame_index_c) + "_depth_raw.png";
-		    cv::Mat raw_depth_img = cv::imread(raw_depth_img_name, CV_LOAD_IMAGE_ANYDEPTH);
+		    cv::Mat raw_depth_img = cv::imread(raw_depth_img_name, cv::IMREAD_ANYDEPTH);
 		    raw_depth_img.convertTo(raw_depth_img, CV_32FC1, 1.0/depth_map_scaling,0);
 
 		    CloudXYZRGB::Ptr point_cloud(new CloudXYZRGB());

@@ -26,7 +26,9 @@ set(SRCS_DUTILS
   DUtils/Random.cpp
   DUtils/Timestamp.cpp)
 
-find_package(OpenCV REQUIRED)
+# find_package(OpenCV REQUIRED)
+# Taijing: Force it to find opencv 4.2 to avoid version conflicts. Modify it if neccessary
+find_package(OpenCV 4.2 EXACT REQUIRED)
 
 set(LIBRARY_OUTPUT_PATH ${PROJECT_SOURCE_DIR}/lib)
 

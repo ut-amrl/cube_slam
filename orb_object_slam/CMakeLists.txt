@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_CXX_FLAGS} -fsanitize=thread")
 project(orb_object_slam)
 
 IF(NOT CMAKE_BUILD_TYPE)
@@ -45,7 +45,9 @@ find_package(catkin REQUIRED COMPONENTS
   tictoc_profiler
 )
 
-find_package(OpenCV REQUIRED)
+# find_package(OpenCV REQUIRED)
+# Taijing: Force it to find opencv 4.2 to avoid version conflicts. Modify it if neccessary
+find_package(OpenCV 4.2 EXACT REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(Pangolin REQUIRED)
 find_package(PythonLibs 2.7 REQUIRED) 

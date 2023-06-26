@@ -1165,7 +1165,7 @@ void LineSegmentDetectorImpl::drawSegments(InputOutputArray _image, InputArray l
     }
     else if (_image.channels() == 3)
     {
-        cvtColor(_image, gray, CV_BGR2GRAY);
+        cvtColor(_image, gray, COLOR_BGR2GRAY);
     }
 
     // Create a 3 channel image in order to draw colored lines

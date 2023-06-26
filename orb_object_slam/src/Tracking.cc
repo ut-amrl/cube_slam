@@ -472,7 +472,9 @@ cv::Mat Tracking::GrabImageMonocular(const cv::Mat &im, const double &timestamp,
 		mCurrentFrame.raw_img = mImGray; // I clone in Keyframe.cc  don't need to clone here.
 	}
 
+	std::cout << "Before track" << std::endl;
 	Track(); // main code here
+	std::cout << "After track" << std::endl;
 
 	return mCurrentFrame.mTcw.clone();
 }
@@ -738,7 +740,9 @@ void Tracking::Track()
 		if (!mCurrentFrame.mpReferenceKF)
 			mCurrentFrame.mpReferenceKF = mpReferenceKF;
 
+		std::cout << "Before Frame" << std::endl;
 		mLastFrame = Frame(mCurrentFrame);
+		std::cout << "After Frame" << std::endl;
 
 		ca::Profiler::tictoc("Tracking time");
 	}
@@ -760,6 +764,7 @@ void Tracking::Track()
 		mlFrameTimes.push_back(mlFrameTimes.back());
 		mlbLost.push_back(mState == LOST);
 	}
+	std::cout << "After store frame pose information" << std::endl;
 
 	if (whether_save_final_optimized_cuboids)
 	{
@@ -770,6 +775,7 @@ void Tracking::Track()
 			ROS_WARN_STREAM("Done save cuboids to txt");
 		}
 	}
+	std::cout << "After saving cuboids (If needed)" << std::endl;
 
 	// implement blocking    block tracking thread, wait until mapping has finished (refine KF)  then track new frame.
 	if (!parallel_mapping)
@@ -778,6 +784,7 @@ void Tracking::Track()
 		mpLocalMapper->RunMappingIteration();
 		ca::Profiler::tictoc("Mapping time");
 	}
+	std::cout << "End track" << std::endl;
 }
 
 void Tracking::StereoInitialization()
@@ -2061,6 +2068,7 @@ void Tracking::CreateNewKeyFrame()
 		ca::Profiler::tictoc("Total detect object time");
 		ca::Profiler::tictoc("Total associate object time");
 		AssociateCuboids(pKF);
+		std::cout << "After AssociateCuboids in CreateNewKeyFrame" << std::endl;
 		ca::Profiler::tictoc("Total associate object time");
 	}
 
@@ -2545,9 +2553,11 @@ void Tracking::CreateNewKeyFrame()
 				pcl::ModelCoefficients coefficients;
 				pcl::PointIndices inliers;
 				seg->setInputCloud(cloud.makeShared());
+				std::cout << "Before plane fitting" << std::endl;
 				ca::Profiler::tictoc("pcl plane fitting time");
 				seg->segment(inliers, coefficients);
 				ca::Profiler::tictoc("pcl plane fitting time");
+				std::cout << "After plane fitting" << std::endl;
 
 				Eigen::Vector4f global_fitted_plane(coefficients.values[0], coefficients.values[1], coefficients.values[2], coefficients.values[3]);
 				float cam_plane_dist, angle_diff_normal;
@@ -2668,6 +2678,8 @@ void Tracking::CreateNewKeyFrame()
 
 	mnLastKeyFrameId = mCurrentFrame.mnId;
 	mpLastKeyFrame = pKF;
+
+	std::cout << "End CreateNewKeyFrame" << std::endl;
 }
 
 void Tracking::SearchLocalPoints()

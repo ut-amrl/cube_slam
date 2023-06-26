@@ -2,8 +2,9 @@
 #include "detect_3d_cuboid/matrix_utils.h"
 
 #include <iostream>
+#include <numeric>
 // opencv
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 #include <opencv2/core/core.hpp>
 #include <opencv2/highgui/highgui.hpp>
 #include "opencv2/imgproc/imgproc.hpp"
@@ -119,7 +120,7 @@ void plot_image_with_cuboid_edges(cv::Mat &plot_img, const MatrixXi &box_corners
         cv::line(plot_img, cv::Point(box_corners_2d(0, edge_conds(0)), box_corners_2d(1, edge_conds(0))),
                  cv::Point(box_corners_2d(0, edge_conds(1)), box_corners_2d(1, edge_conds(1))),
                  cv::Scalar(line_markers(edge_conds(2), 0), line_markers(edge_conds(2), 1), line_markers(edge_conds(2), 2)),
-                 line_markers(edge_conds(2), 3), CV_AA, 0);
+                 line_markers(edge_conds(2), 3), cv::LINE_AA, 0);
     }
 }
 

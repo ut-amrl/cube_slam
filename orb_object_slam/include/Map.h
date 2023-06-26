@@ -24,7 +24,7 @@
 #include <set>
 #include <mutex>
 #include <vector>
-#include <opencv/cv.h>
+#include <opencv2/opencv.hpp>
 
 #include "Eigen/Dense"
 #include <Eigen/Geometry>
