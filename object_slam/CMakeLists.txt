@@ -85,13 +85,13 @@ target_link_libraries(object_slam_node
   ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 )
 
-set(ADDITIONAL_LIBS glog gflags)
-add_executable(propose_cuboids_main src/propose_cuboids_main.cpp)
-target_link_libraries(propose_cuboids_main
-  ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${PCL_LIBRARIES}
-  ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
-  ${ADDITIONAL_LIBS}
-)
+# set(ADDITIONAL_LIBS glog gflags)
+# add_executable(propose_cuboids_main src/propose_cuboids_main.cpp)
+# target_link_libraries(propose_cuboids_main
+#   ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${PCL_LIBRARIES}
+#   ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
+#   ${ADDITIONAL_LIBS}
+# )
 
 #############
 ## Testing ##
