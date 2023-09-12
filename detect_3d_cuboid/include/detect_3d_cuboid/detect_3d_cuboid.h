@@ -58,9 +58,8 @@ class detect_3d_cuboid
       void set_calibration(const Eigen::Matrix3d &Kalib);
       void set_cam_pose(const Eigen::Matrix4d &transToWolrd);
 
-      // object detector needs image, camera pose, and 2D bounding boxes(n*5, each row: xywh+prob)  long edges: n*4.  all number start from 0
-      void detect_cuboid(const cv::Mat &rgb_img, const Eigen::Matrix4d &transToWolrd, const Eigen::MatrixXd &obj_bbox_coors, Eigen::MatrixXd edges,
-                         std::vector<ObjectSet> &all_object_cuboids);
+      std::vector<Eigen::Vector4d> detect_cuboid(const cv::Mat &rgb_img, const Eigen::Matrix4d &transToWolrd, const Eigen::MatrixXd &obj_bbox_coors, Eigen::MatrixXd edges,
+                         std::vector<ObjectSet> &all_object_cuboids, const std::string &output_filepath = std::string()); 
 
       bool whether_plot_detail_images = false;
       bool whether_plot_final_images = false;

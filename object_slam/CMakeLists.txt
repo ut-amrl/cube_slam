@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-set(CMAKE_CXX_FLAGS "-std=c++11 ${CMAKE_CXX_FLAGS}")
+set(CMAKE_CXX_FLAGS "-g -std=c++17 -lstdc++fs ${CMAKE_CXX_FLAGS}")
 project(object_slam)
 
 ## Find catkin macros and libraries
@@ -17,8 +17,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 #find_package(Boost REQUIRED COMPONENTS system)
 find_package(Eigen REQUIRED)
-find_package(OpenCV REQUIRED)
+find_package(OpenCV 4.2 EXACT REQUIRED)
 find_package(PCL REQUIRED)
+find_package(Boost REQUIRED)
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -55,6 +56,7 @@ include_directories(
   ${Eigen_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
   ${PCL_INCLUDE_DIRS}
+  ${Boost_INCLUDE_DIRS}
 )
 
 SET(CMAKE_BUILD_TYPE Release)
@@ -85,13 +87,13 @@ target_link_libraries(object_slam_node
   ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
 )
 
-# set(ADDITIONAL_LIBS glog gflags)
-# add_executable(propose_cuboids_main src/propose_cuboids_main.cpp)
-# target_link_libraries(propose_cuboids_main
-#   ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${PCL_LIBRARIES}
-#   ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
-#   ${ADDITIONAL_LIBS}
-# )
+set(ADDITIONAL_LIBS glog gflags stdc++fs ${OpenCV_LIBS} ${Boost_LIBRARIES})
+add_executable(propose_cuboids_main src/propose_cuboids_main.cpp)
+target_link_libraries(propose_cuboids_main
+  ${catkin_LIBRARIES} ${OpenCV_LIBRARIES} ${PCL_LIBRARIES}
+  ${PROJECT_SOURCE_DIR}/Thirdparty/g2o/lib/libg2o.so
+  ${ADDITIONAL_LIBS}
+)
 
 #############
 ## Testing ##

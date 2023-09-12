@@ -54,9 +54,10 @@ void detect_3d_cuboid::set_cam_pose(const Matrix4d &transToWolrd)
 	//TODO relative measure? not good... then need to change transToWolrd.
 }
 
-void detect_3d_cuboid::detect_cuboid(const cv::Mat &rgb_img, const Matrix4d &transToWolrd, const MatrixXd &obj_bbox_coors,
-									 MatrixXd all_lines_raw, std::vector<ObjectSet> &all_object_cuboids)
+std::vector<Eigen::Vector4d> detect_3d_cuboid::detect_cuboid(const cv::Mat &rgb_img, const Matrix4d &transToWolrd, const MatrixXd &obj_bbox_coors,
+									 MatrixXd all_lines_raw, std::vector<ObjectSet> &all_object_cuboids, const std::string &output_filepath)
 {
+	std::vector<Eigen::Vector4d> inobj_edges;
 	set_cam_pose(transToWolrd);
 	cam_pose_raw = cam_pose;
 
@@ -79,7 +80,8 @@ void detect_3d_cuboid::detect_cuboid(const cv::Mat &rgb_img, const Matrix4d &tra
 	// parameters for cuboid generation
 	double vp12_edge_angle_thre = 15;
 	double vp3_edge_angle_thre = 10;	// 10  10  parameters
-	double shorted_edge_thre = 20;		// if box edge are too short. box might be too thin. most possibly wrong.
+	// TODO (Taijing) may need to tune this
+	double shorted_edge_thre = 10;		// if box edge are too short. box might be too thin. most possibly wrong.
 	bool reweight_edge_distance = true; // if want to compare with all configurations. we need to reweight
 
 	// parameters for proposal scoring
@@ -112,6 +114,14 @@ void detect_3d_cuboid::detect_cuboid(const cv::Mat &rgb_img, const Matrix4d &tra
 		int right_x_raw = left_x_raw + obj_bbox_coors(object_id, 2);
 		int down_y_raw = top_y_raw + obj_height_raw;
 
+		{
+			cv::Mat output_img = rgb_img.clone();
+			cv::rectangle(output_img, cv::Point(left_x_raw, top_y_raw), cv::Point(right_x_raw, down_y_raw),
+				cv::Scalar(255, 0, 0), 2, cv::LINE_8);
+			// cv::imshow("bboxes.png", output_img);
+			cv::imwrite("bboxes.png", output_img);
+		}
+
 		std::vector<int> down_expand_sample_all;
 		down_expand_sample_all.push_back(0);
 		if (whether_sample_bbox_height) // 2D object detection might not be accurate
@@ -142,7 +152,7 @@ void detect_3d_cuboid::detect_cuboid(const cv::Mat &rgb_img, const Matrix4d &tra
 			double obj_diaglength_expan = sqrt(obj_width_raw * obj_width_raw + obj_height_expan * obj_height_expan);
 
 			// sample points on the top edges, if edge is too large, give more samples. give at least 10 samples for all edges. for small object, object pose changes lots
-			int top_sample_resolution = round(min(20, obj_width_raw / 10)); //  25 pixels
+			int top_sample_resolution = round(min(20, std::max(obj_width_raw / 10, 2))); //  25 pixels
 			std::vector<int> top_x_samples;
 			linespace<int>(left_x_raw + 5, right_x_raw - 5, top_sample_resolution, top_x_samples);
 			MatrixXd sample_top_pts(2, top_x_samples.size());
@@ -181,6 +191,26 @@ void detect_3d_cuboid::detect_cuboid(const cv::Mat &rgb_img, const Matrix4d &tra
 			MatrixXd all_lines_merge_inobj;
 			merge_break_lines(all_lines_inside_object.topRows(inside_obj_edge_num), all_lines_merge_inobj, pre_merge_dist_thre,
 							  pre_merge_angle_thre, edge_length_threshold);
+
+			if (!output_filepath.empty()) {
+				std::ofstream ofile_edges;
+				ofile_edges.open(output_filepath);
+				if (!ofile_edges.is_open()) {
+					std::cout << "Failed to open file " << output_filepath << std::endl;
+					exit(1);
+				}
+				for (int i = 0; i < all_lines_merge_inobj.rows(); ++i) {
+					ofile_edges << all_lines_merge_inobj.row(i).col(0) << " "
+								<< all_lines_merge_inobj.row(i).col(1) << " "
+								<< all_lines_merge_inobj.row(i).col(2) << " "
+								<< all_lines_merge_inobj.row(i).col(3) << std::endl;
+				}
+				ofile_edges.close();
+				for (int i = 0; i < all_lines_inside_object.rows(); ++i) {
+					Eigen::Vector4d line = all_lines_inside_object.row(i);
+					inobj_edges.emplace_back(line);
+				}
+			}
 
 			// compute edge angels and middle points
 			VectorXd lines_inobj_angles(all_lines_merge_inobj.rows());
@@ -555,4 +585,5 @@ void detect_3d_cuboid::detect_cuboid(const cv::Mat &rgb_img, const Matrix4d &tra
 			cv::waitKey(0);
 		}
 	}
+	return inobj_edges;
 }
